@@ -1,6 +1,6 @@
 # AutoLab
 
-AutoLab is a control plane that lets a AI agent operate RL training
+Auto Lab is a control plane that lets a AI agent operate RL training
 runs — starting, forking, modifying, killing, and evaluating GRPO experiments — through a
 structured 16-tool API backed by a trainer pool, telemetry layer, and persistent experiment
 store. 
