@@ -1,0 +1,24 @@
+# Phase c-015 — Clean demo run.
+#
+# Scenario: Level-2 MATH with LR=1e-7 (deliberate plateau).
+# Agent is Opus. Goal framing invites fork + eval, not just modify.
+# Budget: 4h — enough for plateau detection + fork + child training + eval.
+
+session_id: phase-c-015
+model_name: claude-sonnet-4-6
+goal: >
+  Train Qwen3-1.7B on MATH-lighteval (Level 2) using GRPO with thinking mode enabled.
+  Start with the provided config and monitor training dynamics. Your job is to find the
+  best achievable accuracy within the budget — whether that means tuning the initial run,
+  forking to explore a different direction, or both. When you have a run that has trained
+  meaningfully and shows positive dynamics, evaluate it on the math benchmark to get a
+  clean accuracy number. Finalize with the best run and a summary of what you observed,
+  what you tried, and why you made each decision.
+success_criterion: >
+  Agent starts a run, monitors dynamics, and makes at least one non-trivial decision
+  (modify, fork, or both) in response to observed training dynamics, with reasoning
+  visible in the decision log. Agent runs eval() on a promising checkpoint and uses
+  the result to inform finalization. Best run and rationale clearly stated in the
+  finalize summary.
+budget_seconds: 21600
+initial_config_path: autolab/configs/grpo_qwen3_math_c015.yaml

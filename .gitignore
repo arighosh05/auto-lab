@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.pyc
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+
+# Environment
+.env
+runpod.txt
+
+# Training artifacts (generated at runtime)
+store/
+logs/
+sessions/
+outputs/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+
+# run_artifacts — exclude generated/runtime files, keep c-015 demo data
+run_artifacts/outputs/
+run_artifacts/*.log
+run_artifacts/store/autolab.db

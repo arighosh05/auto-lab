@@ -1,0 +1,92 @@
+# =============================================================================
+# autolab Phase c-015 — Clean demo run config
+# Based on grpo_qwen3_math_c014.yaml. Changes:
+#   - run_name: grpo-qwen3-math-c015
+#   - max_steps: 300  (more room post-intervention; if fork at ~step 80,
+#                      child still gets ~220 steps of post-fork training)
+# Everything else identical to c014: Level-2, LR=1e-7 plateau, num_gen=8.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Model
+# ---------------------------------------------------------------------------
+model_name: "Qwen/Qwen3-1.7B"
+model_revision: "main"
+
+model_init_kwargs:
+  torch_dtype: "bfloat16"
+  use_cache: true
+
+# ---------------------------------------------------------------------------
+# Dataset
+# ---------------------------------------------------------------------------
+dataset_name: "DigitalLearningGmbH/MATH-lighteval"
+dataset_split_train: "train"
+dataset_split_test: "test"
+dataset_seed: 42
+dataset_max_level: 2           # Level 2: baseline ~40% with thinking, clear upside
+
+enable_thinking: true
+
+# ---------------------------------------------------------------------------
+# System prompt
+# ---------------------------------------------------------------------------
+system_prompt: |
+  You are an expert mathematician. Solve the given problem and put your final
+  answer in a LaTeX box: \boxed{your answer here}.
+
+# ---------------------------------------------------------------------------
+# GRPOConfig parameters
+# ---------------------------------------------------------------------------
+grpo:
+  output_dir: "outputs/grpo-qwen3-1.7b-math"
+  run_name: "grpo-qwen3-math-c015"
+
+  per_device_train_batch_size: 8    # must be multiple of num_generations
+  gradient_accumulation_steps: 2    # effective batch: 8*2=16
+  gradient_checkpointing: true
+
+  max_prompt_length: 512
+  max_completion_length: 2048
+
+  num_generations: 8                # 8 completions/prompt → tighter reward variance
+  beta: 0.05
+  epsilon: 0.2
+  scale_rewards: "group"
+
+  temperature: 0.9
+  top_p: 1.0
+  top_k: 50
+
+  num_train_epochs: 1
+  max_steps: 300
+  learning_rate: 1.0e-7          # Intentionally low — agent should detect plateau
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.05
+
+  logging_steps: 5
+  save_steps: 20
+  save_total_limit: 3
+  save_only_model: true
+  eval_strategy: "no"
+  report_to: "none"
+
+  bf16: true
+  fp16: false
+
+  use_vllm: false
+  remove_unused_columns: false
+  log_completions: false
+
+  seed: 42
+  data_seed: 42
+
+  dataloader_num_workers: 4
+
+# ---------------------------------------------------------------------------
+# Eval config
+# ---------------------------------------------------------------------------
+eval:
+  n_samples: 200
+  batch_size: 8
+  max_new_tokens: 1024
