@@ -1,25 +1,21 @@
 # AutoLab
 
-AutoLab is a control plane that lets a language model agent operate machine learning training
+AutoLab is a control plane that lets a AI agent operate RL training
 runs — starting, forking, modifying, killing, and evaluating GRPO experiments — through a
 structured 16-tool API backed by a trainer pool, telemetry layer, and persistent experiment
-store. Full write-up at aritra.io/autolab. This is a research artifact, not a production system.
+store. 
+
+[https://aritra.io/autolab](https://aritra.io/autolab)
 
 ## Architecture
 
-Five components connect end-to-end. The **ControlPlane** (`autolab/control_plane/plane.py`)
-exposes 16 typed tools the agent calls — write operations (start_run, fork, kill, modify, eval,
-set_active, set_cadence), read operations (get_run_details, list_runs, get_history, get_sample,
-compute_trend, get_config, get_eval), and session ops (sleep, finalize). The **TrainerPool**
-(`autolab/trainer_pool/pool.py`) manages GRPOTrainer instances as lifecycle state machines,
-supporting atomic fork with checkpoint copy and rollback. The **TelemetryLayer**
-(`autolab/telemetry/layer.py`) drains step metrics from a queue, computes windowed trends
-(slope, mean, std) in-layer at emission time, and writes sparse ObservationEvents to the store
-and JSONL logs. The **MetadataStore** (`autolab/store/metadata_store.py`) persists all state in
-SQLite — configs, runs, observations, samples, modifications, evals, and sessions — queryable
-across sessions. The **AgentLoop** (`autolab/agent/loop.py`) runs the LLM, dispatches tool
-calls, enforces the compute budget, and manages the sleep/wake cycle with four interrupt sources:
-timer expiry, hard anomaly, eval completion, and human message.
+| Component | File | Role |
+|---|---|---|
+| **ControlPlane** | `autolab/control_plane/plane.py` | 16-tool agent API — write (start_run, fork, kill, modify, eval, set_active, set_cadence), read (get_run_details, list_runs, get_history, get_sample, compute_trend, get_config, get_eval), session (sleep, finalize) |
+| **TrainerPool** | `autolab/trainer_pool/pool.py` | GRPOTrainer lifecycle state machines — atomic fork with checkpoint copy and rollback |
+| **TelemetryLayer** | `autolab/telemetry/layer.py` | Queue drain → sparse ObservationEvents; windowed trends (slope, mean, std) computed in-layer at emission time |
+| **MetadataStore** | `autolab/store/metadata_store.py` | SQLite — configs, runs, observations, samples, modifications, evals, sessions; queryable across sessions |
+| **AgentLoop** | `autolab/agent/loop.py` | LLM loop, tool dispatch, budget enforcement; sleep/wake with four interrupt sources (timer, anomaly, eval complete, human message) |
 
 ## Demo
 
@@ -78,7 +74,7 @@ scripts/
 tests/
   test_agent_loop.py      Agent loop smoke tests (mock LLM, no GPU)
   test_reward_smoke.py    Reward function unit tests
-run_artifacts/         Phase c-015 session artifacts (DB, logs, conversation)
+run_artifacts/            Phase c-015 session artifacts (DB, logs, conversation)
 ```
 
 ## Known limitations
@@ -88,4 +84,6 @@ iteration will deep-merge fork overrides and accept per-call eval generation con
 
 ## License
 
-MIT. See LICENSE.
+```
+MIT License — Copyright (c) 2026 Aritra Ghosh
+```
